@@ -14,4 +14,3 @@ try {
 } catch (PDOException $e) {
  die('Erro ao conectar com o banco de dados: ' . $e->getMessage());
 }
-13. Test
