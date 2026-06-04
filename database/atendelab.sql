@@ -7,6 +7,9 @@
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
+CREATE DATABASE IF NOT EXISTS atendelab;
+USE atendelab;
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
