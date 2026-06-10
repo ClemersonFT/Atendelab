@@ -1,173 +1,86 @@
 <?php
 
+// ============================================================
+// AtendeLab - routes.php  (Aula 04)
+// Ponto central de roteamento da aplicação.
+// Todas as requisições passam por public/index.php -> aqui.
+// ============================================================
+
+require_once __DIR__ . '/app/Middleware/auth.php';
 require_once __DIR__ . '/app/Controllers/AuthController.php';
 require_once __DIR__ . '/app/Controllers/UsuariosController.php';
 require_once __DIR__ . '/app/Controllers/PessoasController.php';
 require_once __DIR__ . '/app/Controllers/TiposAtendimentosController.php';
 require_once __DIR__ . '/app/Controllers/AtendimentosController.php';
-require_once __DIR__ . '/app/Middleware/auth.php';
 
 $controller = $_GET['controller'] ?? 'auth';
 $action     = $_GET['action']     ?? 'login';
 
+// ─── ROTAS PÚBLICAS (auth) ────────────────────────────────────────────────────
+if ($controller === 'auth') {
+    $auth = new AuthController();
+
+    switch ($action) {
+        case 'login':
+            $auth->exibirLogin();
+            break;
+
+        case 'entrar':
+            $auth->entrar();
+            break;
+
+        case 'dashboard':
+            exigirAutenticacao();
+            $auth->dashboard();
+            break;
+
+        case 'logout':
+            $auth->logout();
+            break;
+
+        default:
+            http_response_code(404);
+            echo 'Ação de autenticação não encontrada.';
+    }
+
+    exit;
+}
+
+// ─── ROTAS PROTEGIDAS ─────────────────────────────────────────────────────────
+// Todas as rotas abaixo exigem sessão ativa
+exigirAutenticacao();
+
 switch ($controller) {
 
-    // ─── AUTH ─────────────────────────────────────────────────────────────────
-    case 'auth':
-        $authController = new AuthController();
-
-        switch ($action) {
-            case 'login':
-                $authController->exibirLogin();
-                break;
-
-            case 'entrar':
-                $authController->entrar();
-                break;
-
-            case 'dashboard':
-                $authController->dashboard();
-                break;
-
-            case 'logout':
-                $authController->logout();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de autenticacao nao encontrada.';
-        }
-        break;
-
-    // ─── USUARIOS ─────────────────────────────────────────────────────────────
+    // ── Usuários ──────────────────────────────────────────────────────────────
     case 'usuarios':
-        exigirAutenticacao();
-        $usuariosController = new UsuariosController();
-
-        switch ($action) {
-            case 'listar':
-                $usuariosController->listar();
-                break;
-
-            case 'buscar':
-                $usuariosController->buscarPorId();
-                break;
-
-            case 'criar':
-                $usuariosController->criar();
-                break;
-
-            case 'atualizar':
-                $usuariosController->atualizar();
-                break;
-
-            case 'excluir':
-                $usuariosController->excluir();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de usuarios nao encontrada.';
-        }
+        $obj = new UsuariosController();
         break;
 
-    // ─── PESSOAS ──────────────────────────────────────────────────────────────
+    // ── Pessoas ───────────────────────────────────────────────────────────────
     case 'pessoas':
-        exigirAutenticacao();
-        $pessoasController = new PessoasController();
-
-        switch ($action) {
-            case 'listar':
-                $pessoasController->listar();
-                break;
-
-            case 'buscar':
-                $pessoasController->buscarPorId();
-                break;
-
-            case 'criar':
-                $pessoasController->criar();
-                break;
-
-            case 'atualizar':
-                $pessoasController->atualizar();
-                break;
-
-            case 'excluir':
-                $pessoasController->excluir();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de pessoas nao encontrada.';
-        }
+        $obj = new PessoasController();
         break;
 
-    // ─── TIPOS DE ATENDIMENTO ─────────────────────────────────────────────────
+    // ── Tipos de atendimento ──────────────────────────────────────────────────
     case 'tipos':
-        exigirAutenticacao();
-        $tiposController = new TiposAtendimentosController();
-
-        switch ($action) {
-            case 'listar':
-                $tiposController->listar();
-                break;
-
-            case 'buscar':
-                $tiposController->buscarPorId();
-                break;
-
-            case 'criar':
-                $tiposController->criar();
-                break;
-
-            case 'atualizar':
-                $tiposController->atualizar();
-                break;
-
-            case 'excluir':
-                $tiposController->excluir();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de tipos nao encontrada.';
-        }
+        $obj = new TiposAtendimentosController();
         break;
 
-    // ─── ATENDIMENTOS ─────────────────────────────────────────────────────────
+    // ── Atendimentos ──────────────────────────────────────────────────────────
     case 'atendimentos':
-        exigirAutenticacao();
-        $atendimentosController = new AtendimentosController();
-
-        switch ($action) {
-            case 'listar':
-                $atendimentosController->listar();
-                break;
-
-            case 'buscar':
-                $atendimentosController->buscarPorId();
-                break;
-
-            case 'criar':
-                $atendimentosController->criar();
-                break;
-
-            case 'atualizar':
-                $atendimentosController->atualizar();
-                break;
-
-            case 'excluir':
-                $atendimentosController->excluir();
-                break;
-
-            default:
-                http_response_code(404);
-                echo 'Acao de atendimentos nao encontrada.';
-        }
+        $obj = new AtendimentosController();
         break;
 
     default:
         http_response_code(404);
-        echo 'Controller nao encontrado.';
+        exit('Controller não encontrado.');
 }
+
+// Verifica se a action existe no controller antes de chamar
+if (!method_exists($obj, $action)) {
+    http_response_code(404);
+    exit('Ação não encontrada.');
+}
+
+$obj->$action();
