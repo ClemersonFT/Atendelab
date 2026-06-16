@@ -16,7 +16,6 @@ require_once __DIR__ . '/app/Controllers/AtendimentosController.php';
 $controller = $_GET['controller'] ?? 'auth';
 $action     = $_GET['action']     ?? 'login';
 
-// ─── ROTAS PÚBLICAS (auth) ────────────────────────────────────────────────────
 if ($controller === 'auth') {
     $auth = new AuthController();
 
