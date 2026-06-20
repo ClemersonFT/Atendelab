@@ -1,0 +1,4 @@
+:root { --atendelab-green: #198754; }
+.card { border-radius: 14px; }
+.table th { white-space: nowrap; }
+textarea { resize: vertical; }

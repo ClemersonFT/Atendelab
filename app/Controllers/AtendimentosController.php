@@ -10,7 +10,6 @@ class AtendimentosController
         $this->pdo = $pdo;
     }
 
-    // ─── helper interno ───────────────────────────────────────────────────────
     private function json(array $dados, int $status = 200): void
     {
         http_response_code($status);
@@ -18,9 +17,6 @@ class AtendimentosController
         echo json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    // ─── LISTAR ───────────────────────────────────────────────────────────────
-    // GET ?controller=atendimentos&action=listar
-    // Retorna dados relacionados via JOIN (pessoa, tipo, responsável)
     public function listar(): void
     {
         $sql = 'SELECT
@@ -42,7 +38,6 @@ class AtendimentosController
 
         $atendimentos = $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-        // Formata protocolo visual: #ATD-0001
         foreach ($atendimentos as &$a) {
             $a['protocolo'] = 'ATD-' . str_pad((string) $a['id'], 4, '0', STR_PAD_LEFT);
         }
@@ -51,8 +46,6 @@ class AtendimentosController
         $this->json($atendimentos);
     }
 
-    // ─── BUSCAR POR ID ────────────────────────────────────────────────────────
-    // GET ?controller=atendimentos&action=buscar&id=1
     public function buscar(): void
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -87,11 +80,6 @@ class AtendimentosController
         $this->json($atendimento);
     }
 
-    // ─── CRIAR ────────────────────────────────────────────────────────────────
-    // POST ?controller=atendimentos&action=criar
-    // Body (x-www-form-urlencoded):
-    //   pessoa_id, tipo_atendimento_id, usuario_id,
-    //   descricao, data_atendimento, horario_atendimento, status (opcional)
     public function criar(): void
     {
         $pessoaId   = filter_var($_POST['pessoa_id']           ?? null, FILTER_VALIDATE_INT);
@@ -102,13 +90,11 @@ class AtendimentosController
         $horario    = $_POST['horario_atendimento']            ?? '';
         $status     = $_POST['status']                         ?? 'aberto';
 
-        // Campos obrigatórios
         if (!$pessoaId || !$tipoId || !$usuarioId || $descricao === '' || $data === '' || $horario === '') {
             $this->json(['erro' => 'Preencha os campos obrigatórios: pessoa_id, tipo_atendimento_id, usuario_id, descricao, data_atendimento, horario_atendimento.'], 422);
             return;
         }
 
-        // Status inicial só pode ser aberto ou em_andamento
         if (!in_array($status, ['aberto', 'em_andamento'], true)) {
             $this->json(['erro' => 'Status inicial inválido. Use aberto ou em_andamento.'], 422);
             return;
@@ -142,7 +128,6 @@ class AtendimentosController
             ], 201);
 
         } catch (PDOException $e) {
-            // FK violation: pessoa, tipo ou usuário inexistente
             if ($e->getCode() === '23000') {
                 $this->json(['erro' => 'pessoa_id, tipo_atendimento_id ou usuario_id inválido.'], 422);
             } else {
@@ -151,9 +136,6 @@ class AtendimentosController
         }
     }
 
-    // ─── ALTERAR STATUS ───────────────────────────────────────────────────────
-    // POST ?controller=atendimentos&action=alterarStatus
-    // Body: id, status, observacao_final (obrigatório quando status=concluido)
     public function alterarStatus(): void
     {
         $id          = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -165,7 +147,6 @@ class AtendimentosController
             return;
         }
 
-        // Regra de negócio: conclusão exige observação final
         if ($status === 'concluido' && $observacao === '') {
             $this->json(['erro' => 'Informe a observação final para concluir o atendimento.'], 422);
             return;
@@ -186,8 +167,6 @@ class AtendimentosController
         $this->json(['mensagem' => 'Status atualizado com sucesso.']);
     }
 
-    // ─── EXCLUIR ──────────────────────────────────────────────────────────────
-    // POST ?controller=atendimentos&action=excluir
     public function excluir(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);

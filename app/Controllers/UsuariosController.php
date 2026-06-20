@@ -1,6 +1,4 @@
 <?php
-// Controller responsável por todas as operações da tabela 'usuarios'.
-// Em MVC, o controller recebe a requisição, valida os dados e acessa o banco.
 
 class UsuariosController
 {
@@ -8,13 +6,11 @@ class UsuariosController
 
     public function __construct()
     {
-        // Importa o arquivo de conexão. O $pdo criado lá dentro fica disponível aqui.
         require __DIR__ . '/../../config/database.php';
         $this->pdo = $pdo;
     }
 
-    // ─── LISTAR ──────────────────────────────────────────────────────────────
-    // GET: ?controller=usuarios&action=listar
+
     public function listar(): void
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -29,13 +25,11 @@ class UsuariosController
         echo json_encode($usuarios, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    // ─── BUSCAR POR ID ────────────────────────────────────────────────────────
-    // GET: ?controller=usuarios&action=buscar&id=1
+  
     public function buscarPorId(): void
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        // filter_input valida e sanitiza o ID vindo pela URL (GET)
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
         if (!$id) {
@@ -63,21 +57,16 @@ class UsuariosController
         echo json_encode($usuario, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    // ─── CRIAR ────────────────────────────────────────────────────────────────
-    // POST: ?controller=usuarios&action=criar
-    // Body (form-encode): nome, email, senha, perfil, status
     public function criar(): void
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        // Lê os campos do formulário enviados via POST
         $nome   = trim($_POST['nome'] ?? '');
         $email  = trim($_POST['email'] ?? '');
         $senha  = $_POST['senha'] ?? '';
         $perfil = trim($_POST['perfil'] ?? 'atendente');
         $status = trim($_POST['status'] ?? 'ativo');
 
-        // Validação de campos obrigatórios
         if ($nome === '' || $email === '' || $senha === '') {
             http_response_code(400);
             echo json_encode(['erro' => 'Nome, e-mail e senha são obrigatórios.']);
@@ -90,7 +79,6 @@ class UsuariosController
             return;
         }
 
-        // Whitelist de perfis aceitos
         if (!in_array($perfil, ['admin', 'atendente', 'aluno'], true)) {
             http_response_code(400);
             echo json_encode(['erro' => 'Perfil inválido.']);
@@ -103,7 +91,6 @@ class UsuariosController
             return;
         }
 
-        // Nunca salvar senha em texto puro — password_hash gera um hash seguro
         $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
         try {
@@ -130,14 +117,10 @@ class UsuariosController
         }
     }
 
-    // ─── ATUALIZAR ────────────────────────────────────────────────────────────
-    // POST: ?controller=usuarios&action=atualizar
-    // Body (form-encode): id, nome, email, perfil, status
     public function atualizar(): void
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        // O ID vem no corpo do POST pois é uma operação de escrita
         $id     = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
         $nome   = trim($_POST['nome']   ?? '');
         $email  = trim($_POST['email']  ?? '');
@@ -197,9 +180,6 @@ class UsuariosController
 }
     }
 
-    // ─── EXCLUIR ─────────────────────────────────────────────────────────────
-    // POST: ?controller=usuarios&action=excluir
-    // Body (form-encode): id
     public function excluir(): void
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -213,7 +193,6 @@ class UsuariosController
         }
 
         try {
-            // DELETE físico — em sistemas reais prefira inativar via UPDATE status
             $sql  = 'DELETE FROM usuarios WHERE id = :id';
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':id', $id, PDO::PARAM_INT);

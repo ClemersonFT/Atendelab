@@ -1,7 +1,7 @@
 <?php
 
 // ============================================================
-// AtendeLab - routes.php  (Aula 04)
+// AtendeLab - routes.php  (Aula 05)
 // Ponto central de roteamento da aplicação.
 // Todas as requisições passam por public/index.php -> aqui.
 // ============================================================
@@ -12,6 +12,7 @@ require_once __DIR__ . '/app/Controllers/UsuariosController.php';
 require_once __DIR__ . '/app/Controllers/PessoasController.php';
 require_once __DIR__ . '/app/Controllers/TiposAtendimentosController.php';
 require_once __DIR__ . '/app/Controllers/AtendimentosController.php';
+require_once __DIR__ . '/app/Controllers/FrontendController.php';
 
 $controller = $_GET['controller'] ?? 'auth';
 $action     = $_GET['action']     ?? 'login';
@@ -69,6 +70,11 @@ switch ($controller) {
     // ── Atendimentos ──────────────────────────────────────────────────────────
     case 'atendimentos':
         $obj = new AtendimentosController();
+        break;
+
+    // ── Frontend (páginas visuais integradas ao backend) ─────────────────────
+    case 'frontend':
+        $obj = new FrontendController();
         break;
 
     default:

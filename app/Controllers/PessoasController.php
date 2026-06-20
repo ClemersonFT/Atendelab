@@ -10,7 +10,6 @@ class PessoasController
         $this->pdo = $pdo;
     }
 
-    // ─── helper interno ───────────────────────────────────────────────────────
     private function json(array $dados, int $status = 200): void
     {
         http_response_code($status);
@@ -18,8 +17,6 @@ class PessoasController
         echo json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    // ─── LISTAR ───────────────────────────────────────────────────────────────
-    // GET ?controller=pessoas&action=listar
     public function listar(): void
     {
         $sql = 'SELECT id, nome, documento, telefone, email,
@@ -32,8 +29,6 @@ class PessoasController
         $this->json($pessoas);
     }
 
-    // ─── BUSCAR POR ID ────────────────────────────────────────────────────────
-    // GET ?controller=pessoas&action=buscar&id=1
     public function buscar(): void
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -60,8 +55,7 @@ class PessoasController
         $this->json($pessoa);
     }
 
-    // ─── CRIAR ────────────────────────────────────────────────────────────────
-    // POST ?controller=pessoas&action=criar
+    
     public function criar(): void
     {
         $nome       = trim($_POST['nome']        ?? '');
@@ -73,7 +67,7 @@ class PessoasController
         $observacoes = trim($_POST['observacoes'] ?? '');
         $status     = $_POST['status']           ?? 'ativo';
 
-        // Campos obrigatórios
+       
         if ($nome === '' || $documento === '' || $email === '') {
             $this->json(['erro' => 'Nome, documento e e-mail são obrigatórios.'], 422);
             return;
@@ -113,8 +107,6 @@ class PessoasController
         }
     }
 
-    // ─── ATUALIZAR ────────────────────────────────────────────────────────────
-    // POST ?controller=pessoas&action=atualizar
     public function atualizar(): void
     {
         $id         = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -164,9 +156,6 @@ class PessoasController
         }
     }
 
-    // ─── INATIVAR ─────────────────────────────────────────────────────────────
-    // POST ?controller=pessoas&action=inativar
-    // Soft-delete: altera status para 'inativo' sem apagar o registro
     public function inativar(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -184,9 +173,6 @@ class PessoasController
         $this->json(['mensagem' => 'Pessoa inativada com sucesso.']);
     }
 
-    // ─── EXCLUIR ──────────────────────────────────────────────────────────────
-    // POST ?controller=pessoas&action=excluir
-    // DELETE físico — use apenas quando não houver atendimentos vinculados
     public function excluir(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -203,7 +189,6 @@ class PessoasController
             $this->json(['mensagem' => 'Pessoa excluída com sucesso.']);
 
         } catch (PDOException $e) {
-            // FK violation: pessoa tem atendimentos vinculados
             $this->json(['erro' => 'Não é possível excluir: pessoa possui atendimentos.'], 409);
         }
     }

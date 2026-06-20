@@ -10,7 +10,6 @@ class TiposAtendimentosController
         $this->pdo = $pdo;
     }
 
-    // ─── helper interno ───────────────────────────────────────────────────────
     private function json(array $dados, int $status = 200): void
     {
         http_response_code($status);
@@ -18,8 +17,6 @@ class TiposAtendimentosController
         echo json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
-    // ─── LISTAR ───────────────────────────────────────────────────────────────
-    // GET ?controller=tipos&action=listar
     public function listar(): void
     {
         $sql = 'SELECT id, nome, descricao, status, criado_em
@@ -31,8 +28,6 @@ class TiposAtendimentosController
         $this->json($tipos);
     }
 
-    // ─── BUSCAR POR ID ────────────────────────────────────────────────────────
-    // GET ?controller=tipos&action=buscar&id=1
     public function buscar(): void
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -58,8 +53,6 @@ class TiposAtendimentosController
         $this->json($tipo);
     }
 
-    // ─── CRIAR ────────────────────────────────────────────────────────────────
-    // POST ?controller=tipos&action=criar
     public function criar(): void
     {
         $nome      = trim($_POST['nome']      ?? '');
@@ -88,8 +81,6 @@ class TiposAtendimentosController
         ], 201);
     }
 
-    // ─── ATUALIZAR ────────────────────────────────────────────────────────────
-    // POST ?controller=tipos&action=atualizar
     public function atualizar(): void
     {
         $id        = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -119,9 +110,6 @@ class TiposAtendimentosController
         $this->json(['mensagem' => 'Tipo de atendimento atualizado com sucesso.']);
     }
 
-    // ─── INATIVAR ─────────────────────────────────────────────────────────────
-    // POST ?controller=tipos&action=inativar
-    // Soft-delete: tipos inativos não aparecem em novos atendimentos
     public function inativar(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -139,8 +127,6 @@ class TiposAtendimentosController
         $this->json(['mensagem' => 'Tipo inativado com sucesso.']);
     }
 
-    // ─── EXCLUIR ──────────────────────────────────────────────────────────────
-    // POST ?controller=tipos&action=excluir
     public function excluir(): void
     {
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
