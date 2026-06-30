@@ -1,167 +1,146 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1:3307
--- Tempo de geração: 27/05/2026 às 01:10
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
-
 CREATE DATABASE IF NOT EXISTS atendelab;
+
 USE atendelab;
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+
+CREATE TABLE usuarios (
+
+    id INT NOT NULL AUTO_INCREMENT,
+
+    nome VARCHAR(100) NOT NULL,
+
+    email VARCHAR(100),
+
+    senha VARCHAR(255) NOT NULL,
+
+    perfil ENUM('admin','usuario') DEFAULT 'usuario',
+
+    status ENUM('ativo','inativo') DEFAULT 'ativo',
+
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+    PRIMARY KEY(id),
 
---
--- Banco de dados: `atendelab`
---
+    UNIQUE(email)
 
--- --------------------------------------------------------
+);
 
---
--- Estrutura para tabela `atendimentos`
---
 
-CREATE TABLE `atendimentos` (
-  `id` int(11) NOT NULL,
-  `pessoa_id` int(11) NOT NULL,
-  `tipo_atendimento` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `data_atendimento` date DEFAULT NULL,
-  `hora_atendimento` time DEFAULT NULL,
-  `descricao` text DEFAULT NULL,
-  `observacao` text DEFAULT NULL,
-  `status` enum('ativo','inativo','cancelado') DEFAULT NULL,
-  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+CREATE TABLE tipos_atendimentos (
 
---
--- Estrutura para tabela `pessoas`
---
+    id INT NOT NULL AUTO_INCREMENT,
 
-CREATE TABLE `pessoas` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `documento` varchar(20) DEFAULT NULL,
-  `telefone` varchar(20) DEFAULT NULL,
-  `curso` varchar(100) DEFAULT NULL,
-  `periodo` varchar(100) DEFAULT NULL,
-  `status` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    nome VARCHAR(100) NOT NULL,
 
--- --------------------------------------------------------
+    descricao TEXT,
 
---
--- Estrutura para tabela `tipos_atendimentos`
---
+    status ENUM('ativo','inativo') DEFAULT 'ativo',
 
-CREATE TABLE `tipos_atendimentos` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `descricao` text DEFAULT NULL,
-  `status` enum('ativo','inativo') DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+    PRIMARY KEY(id)
 
---
--- Estrutura para tabela `usuarios`
---
+);
 
-CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `senha` varchar(255) NOT NULL,
-  `perfil` enum('admin','usuario') DEFAULT NULL,
-  `status` enum('ativo','inativo') DEFAULT NULL,
-  `criado_em` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Índices para tabelas despejadas
---
 
---
--- Índices de tabela `atendimentos`
---
-ALTER TABLE `atendimentos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_atendimento_pessoa` (`pessoa_id`),
-  ADD KEY `fk_atendimento_tipo` (`tipo_atendimento`),
-  ADD KEY `fk_atendimento_usuario` (`usuario_id`);
+CREATE TABLE pessoas (
 
---
--- Índices de tabela `pessoas`
---
-ALTER TABLE `pessoas`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `documento` (`documento`);
+    id INT NOT NULL AUTO_INCREMENT,
 
---
--- Índices de tabela `tipos_atendimentos`
---
-ALTER TABLE `tipos_atendimentos`
-  ADD PRIMARY KEY (`id`);
 
---
--- Índices de tabela `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
+    nome VARCHAR(100) NOT NULL,
 
---
--- AUTO_INCREMENT para tabelas despejadas
---
+    documento VARCHAR(20),
 
---
--- AUTO_INCREMENT de tabela `atendimentos`
---
-ALTER TABLE `atendimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+    telefone VARCHAR(20),
 
---
--- AUTO_INCREMENT de tabela `pessoas`
---
-ALTER TABLE `pessoas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+    email VARCHAR(100),
 
---
--- AUTO_INCREMENT de tabela `tipos_atendimentos`
---
-ALTER TABLE `tipos_atendimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT de tabela `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+    curso VARCHAR(100),
 
---
--- Restrições para tabelas despejadas
---
+    periodo VARCHAR(100),
 
---
--- Restrições para tabelas `atendimentos`
---
-ALTER TABLE `atendimentos`
-  ADD CONSTRAINT `fk_atendimento_pessoa` FOREIGN KEY (`pessoa_id`) REFERENCES `pessoas` (`id`),
-  ADD CONSTRAINT `fk_atendimento_tipo` FOREIGN KEY (`tipo_atendimento`) REFERENCES `tipos_atendimentos` (`id`),
-  ADD CONSTRAINT `fk_atendimento_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
-COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+    observacoes TEXT,
+
+
+    status ENUM('ativo','inativo') DEFAULT 'ativo',
+
+
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ON UPDATE CURRENT_TIMESTAMP,
+
+
+    PRIMARY KEY(id),
+
+    UNIQUE(documento)
+
+);
+
+
+
+CREATE TABLE atendimentos (
+
+    id INT NOT NULL AUTO_INCREMENT,
+
+
+    pessoa_id INT NOT NULL,
+
+
+    tipo_atendimento_id INT NOT NULL,
+
+
+    usuario_id INT NOT NULL,
+
+
+    data_atendimento DATE,
+
+
+    horario_atendimento TIME,
+
+
+    descricao TEXT,
+
+
+    observacao_final TEXT,
+
+
+    status ENUM(
+        'ativo',
+        'inativo',
+        'cancelado'
+    ) DEFAULT 'ativo',
+
+
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+
+    PRIMARY KEY(id),
+
+
+    CONSTRAINT fk_atendimento_pessoa
+
+    FOREIGN KEY(pessoa_id)
+
+    REFERENCES pessoas(id),
+
+
+    CONSTRAINT fk_atendimento_tipo
+
+    FOREIGN KEY(tipo_atendimento_id)
+
+    REFERENCES tipos_atendimentos(id),
+
+
+    CONSTRAINT fk_atendimento_usuario
+
+    FOREIGN KEY(usuario_id)
+
+    REFERENCES usuarios(id)
+
+);
