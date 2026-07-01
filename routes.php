@@ -1,10 +1,5 @@
 <?php
 
-// ============================================================
-// AtendeLab - routes.php  (Aula 05)
-// Ponto central de roteamento da aplicação.
-// Todas as requisições passam por public/index.php -> aqui.
-// ============================================================
 
 require_once __DIR__ . '/app/Middleware/auth.php';
 require_once __DIR__ . '/app/Controllers/AuthController.php';
@@ -46,33 +41,26 @@ if ($controller === 'auth') {
     exit;
 }
 
-// ─── ROTAS PROTEGIDAS ─────────────────────────────────────────────────────────
-// Todas as rotas abaixo exigem sessão ativa
 exigirAutenticacao();
 
 switch ($controller) {
 
-    // ── Usuários ──────────────────────────────────────────────────────────────
     case 'usuarios':
         $obj = new UsuariosController();
         break;
 
-    // ── Pessoas ───────────────────────────────────────────────────────────────
     case 'pessoas':
         $obj = new PessoasController();
         break;
 
-    // ── Tipos de atendimento ──────────────────────────────────────────────────
     case 'tipos':
         $obj = new TiposAtendimentosController();
         break;
 
-    // ── Atendimentos ──────────────────────────────────────────────────────────
     case 'atendimentos':
         $obj = new AtendimentosController();
         break;
 
-    // ── Frontend (páginas visuais integradas ao backend) ─────────────────────
     case 'frontend':
         $obj = new FrontendController();
         break;
@@ -82,7 +70,6 @@ switch ($controller) {
         exit('Controller não encontrado.');
 }
 
-// Verifica se a action existe no controller antes de chamar
 if (!method_exists($obj, $action)) {
     http_response_code(404);
     exit('Ação não encontrada.');
