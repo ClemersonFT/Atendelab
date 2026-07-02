@@ -84,7 +84,7 @@ class AtendimentosController
     {
         $pessoaId   = filter_var($_POST['pessoa_id']           ?? null, FILTER_VALIDATE_INT);
         $tipoId     = filter_var($_POST['tipo_atendimento_id'] ?? null, FILTER_VALIDATE_INT);
-        $usuarioId  = filter_var($_POST['usuario_id']          ?? null, FILTER_VALIDATE_INT);
+        $usuarioId  = usuarioAtual()["id"] ?? null;
         $descricao  = trim($_POST['descricao']                 ?? '');
         $data       = $_POST['data_atendimento']               ?? '';
         $horario    = $_POST['horario_atendimento']            ?? '';
